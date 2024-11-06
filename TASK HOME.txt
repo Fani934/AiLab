@@ -1,0 +1,41 @@
+import pandas as pd
+from sklearn.naive_bayes import CategoricalNB
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+data = {
+    'Location': ['Beach', 'Beach', 'Mountain', 'Desert', 'Forest', 'Beach', 'Park', 'Desert', 'Forest', 'Park', 
+                 'Mountain', 'Beach', 'Desert', 'Park', 'Mountain', 'Beach', 'Desert', 'Park', 'Forest'],
+    'Wind Speed': ['High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'Moderate', 
+                   'Low', 'Low', 'Moderate', 'Low', 'High', 'Low', 'Moderate', 'Low', 'High'],
+    'Play': ['No', 'Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'No', 'Yes', 
+             'Yes', 'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No']
+}
+
+df = pd.DataFrame(data)
+
+location_encoder = LabelEncoder()
+wind_encoder = LabelEncoder()
+play_encoder = LabelEncoder()
+
+df['Location'] = location_encoder.fit_transform(df['Location'])
+df['Wind Speed'] = wind_encoder.fit_transform(df['Wind Speed'])
+df['Play'] = play_encoder.fit_transform(df['Play'])
+
+X = df[['Location', 'Wind Speed']]
+y = df['Play']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+model = CategoricalNB()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+test_data = [[location_encoder.transform(['Beach'])[0], wind_encoder.transform(['Moderate'])[0]]]
+prediction = model.predict(test_data)
+result = 'Yes' if play_encoder.inverse_transform(prediction)[0] == 1 else 'No'
+
+print("Prediction for Beach and Moderate:", result)
+print("Model Accuracy:", accuracy)
