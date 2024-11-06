@@ -1,35 +1,27 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import confusion_matrix, accuracy_score
+from scipy.spatial import distance
+import numpy as np
 
-data = {
-    'Location': ['Beach', 'Beach', 'Mountain', 'Desert', 'Forest', 'Beach', 'Park', 'Desert', 'Forest', 'Park', 
-                 'Mountain', 'Beach', 'Desert', 'Park', 'Forest'],
-    'Wind Speed': ['High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'Moderate', 
-                   'Low', 'Low', 'Moderate', 'Low', 'High'],
-    'Play': ['No', 'Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'No', 'Yes', 
-             'Yes', 'Yes', 'No', 'Yes', 'No']
-}
+X = np.array([
+    [10, 9],
+    [8, 6],
+    [4, 7],
+    [6, 5]
+])
+y = np.array(["Bad", "Bad", "Good", "Good"])
 
-df = pd.DataFrame(data)
-df_encoded = pd.get_dummies(df[['Location', 'Wind Speed']])
-X = df_encoded.values
-y = df['Play'].apply(lambda x: 1 if x == 'Yes' else 0).values
+query_instance = np.array([[3, 7]])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-knn = KNeighborsClassifier(n_neighbors=3)
-knn.fit(X_train, y_train)
+distances = [distance.euclidean(query_instance[0], x) for x in X]
+distance_class_pairs = sorted(zip(distances, y))
 
-test_condition = pd.DataFrame({'Location_Beach': [1], 'Location_Desert': [0], 'Location_Forest': [0], 
-                               'Location_Mountain': [0], 'Location_Park': [0], 'Wind Speed_High': [1], 
-                               'Wind Speed_Low': [0], 'Wind Speed_Moderate': [0]})
-play_prediction = knn.predict(test_condition)
+print("Distances and Classifications:")
+for d, c in distance_class_pairs:
+    print(f"Distance: {d:.2f}, Classification: {c}")
 
-y_pred = knn.predict(X_test)
-conf_matrix = confusion_matrix(y_test, y_pred)
-accuracy = accuracy_score(y_test, y_pred)
+k = 3
+nearest_neighbors = distance_class_pairs[:k]
+predicted_class = max(set([c for _, c in nearest_neighbors]), key=[c for _, c in nearest_neighbors].count)
 
-print("Prediction:", ["Yes" if pred == 1 else "No" for pred in play_prediction])
-print("Confusion Matrix:\n", conf_matrix)
-print("Accuracy:", accuracy)
+print("\nNearest Neighbors (K=3):", nearest_neighbors)
+print(f"Predicted Classification for the query instance (3, 7): {predicted_class}")
