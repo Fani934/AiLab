@@ -1,0 +1,35 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+data = {
+    'Location': ['Beach', 'Beach', 'Mountain', 'Desert', 'Forest', 'Beach', 'Park', 'Desert', 'Forest', 'Park', 
+                 'Mountain', 'Beach', 'Desert', 'Park', 'Forest'],
+    'Wind Speed': ['High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'Moderate', 
+                   'Low', 'Low', 'Moderate', 'Low', 'High'],
+    'Play': ['No', 'Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'No', 'Yes', 
+             'Yes', 'Yes', 'No', 'Yes', 'No']
+}
+
+df = pd.DataFrame(data)
+df_encoded = pd.get_dummies(df[['Location', 'Wind Speed']])
+X = df_encoded.values
+y = df['Play'].apply(lambda x: 1 if x == 'Yes' else 0).values
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(X_train, y_train)
+
+test_condition = pd.DataFrame({'Location_Beach': [1], 'Location_Desert': [0], 'Location_Forest': [0], 
+                               'Location_Mountain': [0], 'Location_Park': [0], 'Wind Speed_High': [1], 
+                               'Wind Speed_Low': [0], 'Wind Speed_Moderate': [0]})
+play_prediction = knn.predict(test_condition)
+
+y_pred = knn.predict(X_test)
+conf_matrix = confusion_matrix(y_test, y_pred)
+accuracy = accuracy_score(y_test, y_pred)
+
+print("Prediction:", ["Yes" if pred == 1 else "No" for pred in play_prediction])
+print("Confusion Matrix:\n", conf_matrix)
+print("Accuracy:", accuracy)
