@@ -4,46 +4,47 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-# Dataset
 data = {
-    'Outlook': ['Sunny', 'Sunny', 'Overcast', 'Rainy', 'Rainy', 'Rainy', 'Overcast', 'Sunny', 'Sunny', 'Rainy', 
-                'Sunny', 'Overcast', 'Overcast', 'Rainy'],
-    'Temperature': ['Hot', 'Hot', 'Hot', 'Mild', 'Cool', 'Cool', 'Cool', 'Mild', 'Cool', 'Mild', 'Mild', 'Mild', 
-                    'Hot', 'Mild'],
-    'Play': ['No', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'No']
+    'age': ['youth', 'youth', 'middle_aged', 'senior', 'senior', 'senior', 'middle_aged', 'youth', 'youth', 'senior', 
+            'youth', 'middle_aged', 'middle_aged', 'senior'],
+    'income': ['high', 'high', 'high', 'medium', 'low', 'low', 'low', 'medium', 'low', 'medium', 
+               'medium', 'medium', 'high', 'medium'],
+    'student': ['no', 'no', 'no', 'no', 'yes', 'yes', 'yes', 'no', 'yes', 'yes', 
+                'yes', 'no', 'yes', 'no'],
+    'credit_rating': ['fair', 'excellent', 'fair', 'fair', 'fair', 'excellent', 'excellent', 'fair', 'fair', 'fair', 
+                      'excellent', 'excellent', 'fair', 'excellent'],
+    'buys_computer': ['no', 'no', 'yes', 'yes', 'yes', 'no', 'yes', 'no', 'yes', 'yes', 
+                      'yes', 'yes', 'yes', 'no']
 }
 
-# Convert data into DataFrame
 df = pd.DataFrame(data)
 
-# Label encoding for categorical variables
-outlook_encoder = LabelEncoder()
-temp_encoder = LabelEncoder()
-play_encoder = LabelEncoder()
+age_encoder = LabelEncoder()
+income_encoder = LabelEncoder()
+student_encoder = LabelEncoder()
+credit_encoder = LabelEncoder()
+buys_computer_encoder = LabelEncoder()
 
-df['Outlook'] = outlook_encoder.fit_transform(df['Outlook'])
-df['Temperature'] = temp_encoder.fit_transform(df['Temperature'])
-df['Play'] = play_encoder.fit_transform(df['Play'])
+df['age'] = age_encoder.fit_transform(df['age'])
+df['income'] = income_encoder.fit_transform(df['income'])
+df['student'] = student_encoder.fit_transform(df['student'])
+df['credit_rating'] = credit_encoder.fit_transform(df['credit_rating'])
+df['buys_computer'] = buys_computer_encoder.fit_transform(df['buys_computer'])
 
-# Features and target variable
-X = df[['Outlook', 'Temperature']]
-y = df['Play']
+X = df[['age', 'income', 'student', 'credit_rating']]
+y = df['buys_computer']
 
-# Train-test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
-
-# Model training
 model = CategoricalNB()
 model.fit(X_train, y_train)
 
-# Accuracy on test data
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
-# Prediction for specific conditions: Overcast and Mild
-test_data = [[outlook_encoder.transform(['Overcast'])[0], temp_encoder.transform(['Mild'])[0]]]
+test_data = [[age_encoder.transform(['youth'])[0], income_encoder.transform(['medium'])[0], 
+              student_encoder.transform(['yes'])[0], credit_encoder.transform(['fair'])[0]]]
 prediction = model.predict(test_data)
-result = 'Yes' if play_encoder.inverse_transform(prediction)[0] == 1 else 'No'
+result = 'yes' if buys_computer_encoder.inverse_transform(prediction)[0] == 1 else 'no'
 
-print("Prediction for Overcast and Mild:", result)
+print("Prediction for youth/medium/yes/fair:", result)
 print("Model Accuracy:", accuracy)
