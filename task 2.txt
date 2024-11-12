@@ -1,0 +1,103 @@
+import numpy as np
+from math import sqrt, exp, pi
+
+# Dataset
+data = [
+    {'X1': 10, 'X2': 9, 'Y': 'Bad'},
+    {'X1': 8, 'X2': 6, 'Y': 'Bad'},
+    {'X1': 4, 'X2': 7, 'Y': 'Good'},
+    {'X1': 6, 'X2': 5, 'Y': 'Good'}
+]
+
+# Separate data by class
+def separate_by_class(dataset):
+    separated = {}
+    for row in dataset:
+        class_value = row['Y']
+        if class_value not in separated:
+            separated[class_value] = []
+        separated[class_value].append(row)
+    return separated
+
+# Calculate mean and standard deviation
+def mean(numbers):
+    return sum(numbers) / float(len(numbers))
+
+def stdev(numbers):
+    if len(numbers) < 2:  # Prevent division by zero
+        return 1e-6
+    avg = mean(numbers)
+    variance = sum([(x - avg) ** 2 for x in numbers]) / float(len(numbers) - 1)
+    return sqrt(variance)
+
+# Calculate mean and stdev for each feature in the dataset by class
+def summarize_by_class(dataset):
+    separated = separate_by_class(dataset)
+    summaries = {}
+    for class_value, rows in separated.items():
+        summaries[class_value] = {
+            'X1': (mean([row['X1'] for row in rows]), stdev([row['X1'] for row in rows])),
+            'X2': (mean([row['X2'] for row in rows]), stdev([row['X2'] for row in rows]))
+        }
+    return summaries
+
+# Calculate Gaussian Probability Density Function
+def calculate_probability(x, mean, stdev):
+    exponent = exp(-((x - mean) ** 2 / (2 * stdev ** 2)))
+    return (1 / (sqrt(2 * pi) * stdev)) * exponent
+
+# Calculate class probabilities
+def calculate_class_probabilities(summaries, input_row):
+    probabilities = {}
+    for class_value, class_summaries in summaries.items():
+        probabilities[class_value] = 1
+        for feature in input_row:
+            if feature != 'Y':
+                mean, stdev = class_summaries[feature]
+                probabilities[class_value] *= calculate_probability(input_row[feature], mean, stdev)
+    return probabilities
+
+# Predict the class
+def predict(summaries, input_row):
+    probabilities = calculate_class_probabilities(summaries, input_row)
+    best_label, best_prob = None, -1
+    for class_value, probability in probabilities.items():
+        if best_label is None or probability > best_prob:
+            best_prob = probability
+            best_label = class_value
+    return best_label
+
+# Leave-One-Out Cross-Validation for Model Accuracy
+def calculate_accuracy(dataset):
+    correct_predictions = 0
+    for i in range(len(dataset)):
+        # Split dataset into training and test sets
+        test_row = dataset[i]
+        train_set = dataset[:i] + dataset[i+1:]
+        
+        # Train the model on train_set
+        summaries = summarize_by_class(train_set)
+        
+        # Predict the class for the test_row
+        prediction = predict(summaries, test_row)
+        actual = test_row['Y']
+        
+        # Check if the prediction is correct
+        if prediction == actual:
+            correct_predictions += 1
+    
+    # Calculate accuracy
+    accuracy = correct_predictions / len(dataset) * 100
+    return accuracy
+
+# Prepare the model
+summaries = summarize_by_class(data)
+
+# Test the model with a new sample
+new_sample = {'X1': 7, 'X2': 6}  # Example input
+prediction = predict(summaries, new_sample)
+print(f"Predicted class for X1={new_sample['X1']} and X2={new_sample['X2']}: {prediction}")
+
+# Calculate and print model accuracy
+accuracy = calculate_accuracy(data)
+print(f"Model Accuracy: {accuracy:.2f}%")
