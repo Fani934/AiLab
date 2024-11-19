@@ -1,0 +1,55 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.preprocessing import LabelEncoder
+
+data = {
+    'X1': [10, 8, 4, 6],
+    'X2': [9, 6, 7, 5],
+    'Y': ['Bad', 'Bad', 'Good', 'Good']
+}
+
+df = pd.DataFrame(data)
+
+le = LabelEncoder()
+df['Y'] = le.fit_transform(df['Y'])
+
+X = df[['X1', 'X2']]
+y = df['Y']
+
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+
+y_pred = clf.predict(X)
+conf_matrix = confusion_matrix(y, y_pred)
+accuracy = accuracy_score(y, y_pred)
+
+print("Confusion Matrix:")
+print(conf_matrix)
+print("Accuracy of the Model:", accuracy)
+
+new_x1 = int(input("Enter Sugar Content (g): "))
+new_x2 = int(input("Enter Fiber Content (g): "))
+
+new_entry = pd.DataFrame({'X1': [new_x1], 'X2': [new_x2]})
+new_prediction = clf.predict(new_entry)
+new_class = le.inverse_transform(new_prediction)[0]
+
+df = pd.concat([df, pd.DataFrame({'X1': [newx1], 'X2': [new_x2], 'Y': [new_prediction[0]]})], ignore_index=True)
+
+print("Prediction for New Entry:", new_class)
+
+X = df[['X1', 'X2']]
+y = df['Y']
+
+clf.fit(X, y)
+y_pred = clf.predict(X)
+
+conf_matrix = confusion_matrix(y, y_pred)
+accuracy = accuracy_score(y, y_pred)
+
+print("Updated Confusion Matrix:")
+print(conf_matrix)
+print("Updated Accuracy of the Model:", accuracy)
+
+
