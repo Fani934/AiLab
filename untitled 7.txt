@@ -1,0 +1,53 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+# Load the data into a pandas DataFrame
+data = {
+    'Location': ['Beach', 'Beach', 'Mountain', 'Desert', 'Forest', 'Beach', 'Park', 'Desert', 'Forest', 'Park', 'Mountain', 'Beach', 'Desert', 'Park', 'Forest'],
+    'Wind Speed': ['High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'High', 'Low', 'Moderate', 'Moderate', 'Low', 'Low', 'Moderate', 'Low', 'High'],
+    'Play': ['No', 'Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No']
+}
+
+df = pd.DataFrame(data)
+
+# Encode categorical data
+le_location = LabelEncoder()
+le_wind_speed = LabelEncoder()
+le_play = LabelEncoder()
+
+df['Location'] = le_location.fit_transform(df['Location'])
+df['Wind Speed'] = le_wind_speed.fit_transform(df['Wind Speed'])
+df['Play'] = le_play.fit_transform(df['Play'])
+
+# Split features and target
+X = df[['Location', 'Wind Speed']]
+y = df['Play']
+
+# Train the Decision Tree classifier
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+
+# Evaluate the model
+y_pred = clf.predict(X)
+conf_matrix = confusion_matrix(y, y_pred)
+accuracy = accuracy_score(y, y_pred)
+
+print("Confusion Matrix:")
+print(conf_matrix)
+print("Accuracy of the Model:", accuracy)
+
+# Get user input for prediction
+new_location = input("Enter Location (Beach, Mountain, Desert, Forest, Park): ")
+new_wind_speed = input("Enter Wind Speed (High, Low, Moderate): ")
+
+# Encode user input
+encoded_location = le_location.transform([new_location])[0]
+encoded_wind_speed = le_wind_speed.transform([new_wind_speed])[0]
+
+# Predict
+prediction = clf.predict([[encoded_location, encoded_wind_speed]])
+result = le_play.inverse_transform(prediction)[0]
+
+print("Prediction for Play:", result)
