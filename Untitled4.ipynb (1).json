@@ -1,65 +1,30 @@
-{
-  "metadata": {
-    "kernelspec": {
-      "name": "python",
-      "display_name": "Python (Pyodide)",
-      "language": "python"
-    },
-    "language_info": {
-      "codemirror_mode": {
-        "name": "python",
-        "version": 3
-      },
-      "file_extension": ".py",
-      "mimetype": "text/x-python",
-      "name": "python",
-      "nbconvert_exporter": "python",
-      "pygments_lexer": "ipython3",
-      "version": "3.8"
-    }
-  },
-  "nbformat_minor": 5,
-  "nbformat": 4,
-  "cells": [
-    {
-      "id": "aecb3bd1-133f-4ee3-87be-d90aa87bc25d",
-      "cell_type": "code",
-      "source": "graph =  {'A' : ['B','C','D'], 'B': [], 'C':['A', 'E', 'F'],'D':['A', 'F'], 'E':['C'],'F':['C']}\ndef dfs(graph, start, end):\n    visited = []\n    stack = [start]\n    while stack:\n        node = stack.pop()\n        visited.append(node)\n        print(\"Open-List:\", {node}, end=\" \")\n        print(\"Close-List:\", visited)\n        if node == end:\n            break\n        for neighbor in reversed(graph[node]):\n            if neighbor not in visited:\n                stack.append(neighbor)\nprint(\"Depth First Search:\")\ndfs(graph, 'A', 'F')\n\n",
-      "metadata": {
-        "trusted": true
-      },
-      "outputs": [],
-      "execution_count": null
-    },
-    {
-      "id": "b8e9063e-2f03-40f2-9f70-9132e1a05c51",
-      "cell_type": "code",
-      "source": "graph = {\n    'A': ['B', 'C', 'D'],\n    'B': [],\n    'C': ['A', 'E', 'F'],\n    'D': ['A', 'F'],\n    'E': ['C'],\n    'F': ['C']\n}\n\ndef bfs(graph, start, end):\n    visited = []\n    queue = [start]\n\n    while queue:\n        node = queue.pop(0)\n        if node not in visited:\n            visited.append(node)\n            print(\"Open-List:\", queue, end=\" | \")\n            print(\"Close-List:\", visited)\n            if node == end:\n                break\n            for neighbor in graph[node]:\n                if neighbor not in visited:\n                    queue.append(neighbor)\n\n    print(\"\\nBreadth First Search completed!\")\n    print(\"Visited nodes in order:\", visited)\n\nprint(\"Breadth First Search:\")\nbfs(graph, 'A', 'F')",
-      "metadata": {
-        "trusted": true
-      },
-      "outputs": [],
-      "execution_count": null
-    },
-    {
-      "id": "7b095be8-39be-482b-a598-4c229d9ea57e",
-      "cell_type": "code",
-      "source": "class Employee:\n    empCount = 0\n    def __init__(self,empName,empID,salary):\n        self.empName = empName\n        self.empID = empID        \n        self.salary = salary   \n        Employee.empCount +=1\n    @classmethod\n    def displayCount(cls):\n        # Class method to display the total number of employees\n        print(f\"Total Employees: {cls.empCount}\")\n    def displayDetails(self):\n        print(f\"Employee Name : {self.empName}\")\n        print(f\"Employee ID : {self.empID}\")\n        print(f\"Employee Salary : {self.salary}\")\nemp1 = Employee(\"Sameer\",119,25000)\nemp2 = Employee(\"Hamza\",102, 27000)\nemp3 = Employee(\"Amir\",91, 27000)\nemp1.displayDetails()\nemp2.displayDetails()\nemp3.displayDetails()\nEmployee.displayCount()\n\n",
-      "metadata": {
-        "trusted": true
-      },
-      "outputs": [],
-      "execution_count": null
-    },
-    {
-      "id": "51d703ac-26a1-4035-a48f-a7f3dd678cc3",
-      "cell_type": "code",
-      "source": "class StudentDatabase:\n    def __init__(self):\n        self.student_db = {}\n    def add_student(self, student_id, name, grade):\n        self.student_db[student_id] = {'Name': name, 'Grade': grade}\n    def display_students(self):\n        print(\"Student Database:\")\n        for student_id, info in self.student_db.items():\n            print(f\"ID: {student_id}, Name: {info['Name']}, Grade: {info['Grade']}\")\n    def get_average_grade(self):\n        if not self.student_db:\n            return 0 \n        total_grades = sum(info['Grade'] for info in self.student_db.values())\n        return total_grades / len(self.student_db)\ndatabase = StudentDatabase()\ndatabase.add_student(119, 'Sameer Ahmed', 85)\ndatabase.add_student(102, 'Hamza Ahmed', 92)\ndatabase.add_student(91, 'Amir Mehmood', 78)\ndatabase.display_students()\naverage_grade = database.get_average_grade()\nprint(f\"Average Grade: {average_grade}\")\n\n",
-      "metadata": {
-        "trusted": true
-      },
-      "outputs": [],
-      "execution_count": null
-    }
-  ]
+graph = {
+    'A': ['B', 'C', 'D'],
+    'B': [],
+    'C': ['A', 'E', 'F'],
+    'D': ['A', 'F'],
+    'E': ['C'],
+    'F': ['C']
 }
+
+def bfs(graph, start, end):
+    visited = []
+    queue = [start]
+
+    while queue:
+        node = queue.pop(0)
+        if node not in visited:
+            visited.append(node)
+            print("Open-List:", queue, end=" | ")
+            print("Close-List:", visited)
+            if node == end:
+                break
+            for neighbor in graph[node]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+
+    print("\nBreadth First Search completed!")
+    print("Visited nodes in order:", visited)
+
+print("Breadth First Search:")
+bfs(graph, 'A', 'F')
